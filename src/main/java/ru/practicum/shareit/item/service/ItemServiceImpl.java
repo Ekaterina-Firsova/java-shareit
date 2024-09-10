@@ -81,7 +81,7 @@ public class ItemServiceImpl implements ItemService {
         }
         return itemStorage.findAll().stream()
                 .map(ItemMapper::mapToItemDto)
-                .filter(itemDto -> itemDto.getAvailable() &
+                .filter(itemDto -> itemDto.getAvailable() &&
                         itemDto.getName().toLowerCase().contains(text.toLowerCase())
                         || itemDto.getDescription().toLowerCase().contains(text.toLowerCase())
                 )
