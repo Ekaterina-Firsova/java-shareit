@@ -11,7 +11,6 @@ import ru.practicum.shareit.item.storage.ItemStorage;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserStorage;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -54,7 +53,7 @@ public class ItemServiceImpl implements ItemService {
 
 
     @Override
-    public Collection<ItemDto> getAll() {
+    public List<ItemDto> getAll() {
         return itemStorage.findAll().stream()
                 .map(ItemMapper::mapToItemDto)
                 .toList();
@@ -67,7 +66,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Collection<ItemDto> getAllFromUser(Long userId) {
+    public List<ItemDto> getAllFromUser(Long userId) {
         return itemStorage.findAll().stream()
                 .map(ItemMapper::mapToItemDto)
                 .filter(itemDto -> Objects.equals(itemDto.getOwner().getId(), userId))
@@ -75,7 +74,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Collection<ItemDto> getText(String text) {
+    public List<ItemDto> getText(String text) {
         if (text == null || text.isEmpty()) {
             return List.of();
         }
