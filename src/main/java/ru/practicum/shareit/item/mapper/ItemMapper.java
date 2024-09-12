@@ -2,7 +2,6 @@ package ru.practicum.shareit.item.mapper;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.experimental.UtilityClass;
-import ru.practicum.shareit.exception.InvalidDataException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 
