@@ -2,10 +2,13 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.comment.dto.CommentDto;
 import ru.practicum.shareit.comment.mapper.CommentMapper;
 import ru.practicum.shareit.comment.model.Comment;
 import ru.practicum.shareit.comment.repository.CommentRepository;
+import ru.practicum.shareit.exception.InvalidDataException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
@@ -15,6 +18,7 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -26,6 +30,7 @@ public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
+    private final BookingRepository bookingRepository;
 
     @Override
     public ItemDto create(Long userId, ItemDto itemDto) {
@@ -49,10 +54,7 @@ public class ItemServiceImpl implements ItemService {
                 .orElseThrow(() -> new NotFoundException("Item not found"));
 
         if (Objects.equals(item.getOwner().getId(), userId)) {
-            List<CommentDto> comments = commentRepository.findByItemId(itemId)
-                    .stream()
-                    .map(CommentMapper::mapToCommentDto)
-                    .collect(Collectors.toList());
+            List<CommentDto> comments = getComments(itemId);
 
             if (updatedItem.getAvailable() != null) {
                 item.setAvailable(updatedItem.getAvailable());
@@ -78,23 +80,20 @@ public class ItemServiceImpl implements ItemService {
 
         return items.stream()
                 .map(item -> {
-                    List<CommentDto> comments = commentRepository.findByItemId(item.getId()) // Извлекаем комментарии для каждого элемента
-                            .stream()
-                            .map(CommentMapper::mapToCommentDto)
-                            .toList();
-                    return ItemMapper.mapToItemDto(item, comments); // Составляем ItemDto с комментариями
+                    List<CommentDto> comments = getComments(item.getId()); // Получаем комментарии для каждого элемента с информацией о пользователе
+                    return ItemMapper.mapToItemDto(item, comments); // Создаем ItemDto с комментариями
                 })
-                .toList();
+                .collect(Collectors.toList());
     }
 
     @Override
     public ItemDto getById(Long id) {
-        List<CommentDto> comments = commentRepository.findByItemId(id)
-                .stream()
-                .map(CommentMapper::mapToCommentDto)
-                .collect(Collectors.toList());
-        return ItemMapper.mapToItemDto(itemRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Item not found")), comments);
+        Item item = itemRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Item not found")); // Извлекаем элемент
+
+        List<CommentDto> comments = getComments(item.getId()); // Получаем комментарии с информацией о пользователе
+
+        return ItemMapper.mapToItemDto(item, comments); // Создаем ItemDto с комментариями
     }
 
     @Override
@@ -103,10 +102,7 @@ public class ItemServiceImpl implements ItemService {
 
         return items.stream()
                 .map(item -> {
-                    List<CommentDto> comments = commentRepository.findByItemId(item.getId()) // Извлекаем комментарии для каждого элемента
-                            .stream()
-                            .map(CommentMapper::mapToCommentDto)
-                            .toList();
+                    List<CommentDto> comments = getComments(item.getId()); // Извлекаем комментарии с авторами для каждого элемента
                     return ItemMapper.mapToItemDto(item, comments); // Составляем ItemDto с комментариями
                 })
                 .toList();
@@ -119,12 +115,19 @@ public class ItemServiceImpl implements ItemService {
         }
         List<Item> items = itemRepository.findByAvailableTrueAndNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(text, text);
 
+//        return items.stream()
+//                .map(item -> {
+//                    List<CommentDto> comments = commentRepository.findByItemId(item.getId()) // Получаем комментарии для каждого элемента
+//                            .stream()
+//                            .map(CommentMapper::mapToCommentDto)
+//                            .toList();
+//                    return ItemMapper.mapToItemDto(item, comments); // Создаем ItemDto с комментариями
+//                })
+//                .toList();
         return items.stream()
                 .map(item -> {
-                    List<CommentDto> comments = commentRepository.findByItemId(item.getId()) // Получаем комментарии для каждого элемента
-                            .stream()
-                            .map(CommentMapper::mapToCommentDto)
-                            .toList();
+                    // Получаем комментарии для каждого элемента
+                    List<CommentDto> comments = getComments(item.getId());
                     return ItemMapper.mapToItemDto(item, comments); // Создаем ItemDto с комментариями
                 })
                 .toList();
@@ -132,32 +135,53 @@ public class ItemServiceImpl implements ItemService {
 
 
     @Override
-    public ItemDto createComment(Long itemId, CommentDto commentDto, Long userId) {
+    public CommentDto createComment(Long itemId, CommentDto commentDto, Long userId) {
 
-        User author = userRepository.findById(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
-        Item item = itemRepository.findById(itemId)
+        itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Item not found"));
+
+        LocalDateTime now = LocalDateTime.now();
+        List<Booking> bookings = bookingRepository.findByItemIdAndBookerId(itemId, userId);
+
+        LocalDate today = LocalDate.now();
+
+        boolean hasActiveBooking = bookings.stream()
+                .anyMatch(booking -> {
+                    LocalDate startDate = booking.getStart().toLocalDate();
+                    LocalDate endDate = booking.getEnd().toLocalDate();
+                    // Проверка, что аренда была завершена до текущего дня
+                    return startDate.isBefore(today) && endDate.isBefore(today) && !startDate.isEqual(endDate);
+                });
+
+        if (!hasActiveBooking) {
+            throw new InvalidDataException("User did not rent this item or the rental period has not ended");
+        }
 
         Comment comment = Comment.builder()
                 .text(commentDto.getText())
-                .item(item)
-                .author(author)
+                .itemId(itemId)
+                .authorId(userId)
                 .created(LocalDateTime.now())
                 .build();
 
         commentRepository.save(comment);
 
-        List<CommentDto> comments = getComments(itemId);
-
-         return ItemMapper.mapToItemDto(item, comments);
+         return CommentMapper.mapToCommentDto(comment, user);
     }
 
     protected List<CommentDto> getComments(Long itemId) {
-        return commentRepository.findByItemId(itemId)
-                .stream()
-                .map(CommentMapper::mapToCommentDto)
+        List<Comment> comments = commentRepository.findByItemId(itemId);
+
+        return comments.stream()
+                .map(comment -> {
+                    User author = userRepository.findById(comment.getAuthorId())
+                            .orElseThrow(() -> new NotFoundException("User not found")); // Получаем пользователя по ID автора
+                    return CommentMapper.mapToCommentDto(comment, author); // Передаем найденного пользователя в маппер
+                })
                 .collect(Collectors.toList());
     }
+
 }

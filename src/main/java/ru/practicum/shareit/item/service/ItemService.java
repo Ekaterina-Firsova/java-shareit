@@ -20,5 +20,5 @@ public interface ItemService extends CrudService<ItemDto> {
 
     List<ItemDto> getText(String text);
 
-    ItemDto createComment(Long itemId, CommentDto comment, Long userId);
+    CommentDto createComment(Long itemId, CommentDto comment, Long userId);
 }

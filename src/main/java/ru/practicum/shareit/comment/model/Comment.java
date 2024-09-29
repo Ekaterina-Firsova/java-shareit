@@ -36,22 +36,22 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "item_id", nullable = false)
-    private Item item;
+//    @ManyToOne(fetch = FetchType.EAGER)
+//    @JoinColumn(name = "item_id", nullable = false)
+//    private Item item;
 
-//    @Column(name = "item_id")
-//    private Long itemId;
+    @Column(name = "item_id")
+    private Long itemId;
 
     @Column(name = "text")
     private String  text;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "author_id", nullable = false)
-    private User author;
+//    @ManyToOne(fetch = FetchType.EAGER)
+//    @JoinColumn(name = "author_id", nullable = false)
+//    private User author;
 
-//    @Column(name = "author_id")
-//    private Long authorId;
+    @Column(name = "author_id")
+    private Long authorId;
 
     @Column(name = "created")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
