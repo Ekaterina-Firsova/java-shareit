@@ -18,6 +18,7 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
 
 import java.util.Collection;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -55,7 +56,7 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public Collection<ItemDto> getItem(@RequestParam String text) {
+    public List<ItemDto> getItem(@RequestParam String text) {
         log.info("Request GET /search: {}", text);
         return itemService.getText(text);
     }

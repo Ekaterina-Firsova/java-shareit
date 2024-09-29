@@ -1,47 +1,16 @@
 package ru.practicum.shareit.user.service;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.service.CrudService;
-import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.mapper.UserMapper;
-import ru.practicum.shareit.user.storage.UserStorage;
-
 import java.util.Collection;
 
-@Service
-@RequiredArgsConstructor
-public class UserService implements CrudService<UserDto> {
-    private final UserStorage userStorage;
+public interface UserService<User> {
 
-    @Override
-    public UserDto create(UserDto userDto) {
-        return UserMapper.mapToUserDto(userStorage.create(UserMapper.mapToUser(userDto)));
-    }
+    User create(User t);
 
-    @Override
-    public Collection<UserDto> getAll() {
-        return userStorage.findAll().stream()
-                .map(UserMapper::mapToUserDto)
-                .toList();
-    }
+    User update(Long id, User t);
 
-    @Override
-    public UserDto getById(Long id) {
-        return UserMapper.mapToUserDto(userStorage.getById(id)
-                .orElseThrow(() -> new NotFoundException("User with ID = " + id + " not found.")));
-    }
+    Collection<User> getAll();
 
-    @Override
-    public void delete(long id) {
-        userStorage.delete(id);
-    }
+    User getById(Long id);
 
-    @Override
-    public UserDto update(Long id, UserDto userDto) {
-        return UserMapper.mapToUserDto(userStorage.update(id, UserMapper.mapToUser(userDto)));
-    }
-
-
+    void delete(long id);
 }

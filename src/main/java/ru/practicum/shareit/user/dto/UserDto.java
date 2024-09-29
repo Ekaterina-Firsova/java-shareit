@@ -11,5 +11,4 @@ public class UserDto {
     private String name;
     @Email(message = "Email should be correct format")
     private String email;
-
 }
