@@ -13,11 +13,12 @@ import java.util.Optional;
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query("""
-        SELECT b 
-            FROM Booking b 
-            WHERE b.booker.id = :userId AND b.start <= CURRENT_TIMESTAMP AND b.end >= CURRENT_TIMESTAMP
+            SELECT b
+                FROM Booking b
+                WHERE b.booker.id = :userId AND b.start <= CURRENT_TIMESTAMP AND b.end >= CURRENT_TIMESTAMP
             """)
     List<Booking> findCurrentBookings(Long userId);
+
     @Query("SELECT b FROM Booking b WHERE b.booker.id = :userId AND b.start > CURRENT_TIMESTAMP ORDER BY b.start DESC")
     List<Booking> findFutureBookings(Long userId);
 
