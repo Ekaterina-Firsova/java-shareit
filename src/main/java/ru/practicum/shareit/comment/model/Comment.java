@@ -23,10 +23,10 @@ import ru.practicum.shareit.user.model.User;
 import java.time.LocalDateTime;
 
 /**
- * Entity add-bookings.
+ * Entity add-comments.
  */
 @Entity
-@Table(name = "bookings")
+@Table(name = "comments")
 @Data
 @Builder
 @AllArgsConstructor
@@ -36,22 +36,24 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "start_date")
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime  start;
-
-    @Column(name = "end_date")
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime end;
-
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "item_id", nullable = false)
     private Item item;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "booker_id", nullable = false)
-    private User booker;
+//    @Column(name = "item_id")
+//    private Long itemId;
 
-    @Enumerated(EnumType.STRING)
-    private BookingStatus status;
+    @Column(name = "text")
+    private String  text;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "author_id", nullable = false)
+    private User author;
+
+//    @Column(name = "author_id")
+//    private Long authorId;
+
+    @Column(name = "created")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private LocalDateTime  created;
 }

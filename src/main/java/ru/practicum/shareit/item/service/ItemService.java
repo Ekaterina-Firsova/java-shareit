@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.service;
 
+import ru.practicum.shareit.comment.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.service.CrudService;
 
@@ -18,4 +19,6 @@ public interface ItemService extends CrudService<ItemDto> {
     List<ItemDto> getAllFromUser(Long userId);
 
     List<ItemDto> getText(String text);
+
+    ItemDto createComment(Long itemId, CommentDto comment, Long userId);
 }
