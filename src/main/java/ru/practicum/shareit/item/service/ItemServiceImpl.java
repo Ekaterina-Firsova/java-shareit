@@ -34,13 +34,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto create(Long userId, ItemDto itemDto) {
         User owner = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("User not found"));
-        if (itemDto.getName() == null || itemDto.getName().isEmpty()) {
-            throw new InvalidDataException("Name cannot be empty");
-        }
-        if (itemDto.getDescription() == null || itemDto.getDescription().isEmpty()) {
-            throw new InvalidDataException("Description cannot be empty");
-        }
+                .orElseThrow(() -> new InvalidDataException("User not found"));
 
         Item item = Item.builder()
                 .name(itemDto.getName())
