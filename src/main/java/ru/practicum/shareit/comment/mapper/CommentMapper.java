@@ -14,9 +14,7 @@ public class CommentMapper {
         return CommentDto.builder()
                 .id(comment.getId())
                 .created(comment.getCreated())
-                //.item(comment.getItem())
                 .itemId(comment.getItemId())
-                //.author(comment.getAuthor())
                 .authorName(user.getName())
                 .text(comment.getText())
                 .build();
@@ -30,9 +28,7 @@ public class CommentMapper {
         return Comment.builder()
                 .id(commentDto.getId())
                 .created(commentDto.getCreated())
-                //.item(commentDto.getItem())
                 .itemId(commentDto.getItemId())
-//                .author(commentDto.getAuthor())
                 .authorId(user.getId())
                 .text(commentDto.getText())
                 .build();

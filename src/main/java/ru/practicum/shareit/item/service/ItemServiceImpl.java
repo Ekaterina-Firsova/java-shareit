@@ -18,7 +18,6 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -45,7 +44,7 @@ public class ItemServiceImpl implements ItemService {
                 .request(itemDto.getRequest())
                 .build();
 
-        return ItemMapper.mapToItemDto(itemRepository.save(item), List.of());
+        return ItemMapper.mapToItemDto(itemRepository.save(item), List.of(), null, null);
     }
 
     @Override
@@ -68,20 +67,19 @@ public class ItemServiceImpl implements ItemService {
             if (updatedItem.getDescription() != null) {
                 item.setDescription(updatedItem.getDescription());
             }
-            return ItemMapper.mapToItemDto(itemRepository.save(item), comments);
+            return ItemMapper.mapToItemDto(itemRepository.save(item), comments, null, null);
         }
         throw new NotFoundException("The user with ID = " + userId + " is not the owner");
     }
 
-
     @Override
     public List<ItemDto> getAll() {
-        List<Item> items = itemRepository.findAll(); // Извлекаем все элементы
+        List<Item> items = itemRepository.findAll();
 
         return items.stream()
                 .map(item -> {
-                    List<CommentDto> comments = getComments(item.getId()); // Получаем комментарии для каждого элемента с информацией о пользователе
-                    return ItemMapper.mapToItemDto(item, comments); // Создаем ItemDto с комментариями
+                    List<CommentDto> comments = getComments(item.getId());
+                    return ItemMapper.mapToItemDto(item, comments, null, null);
                 })
                 .collect(Collectors.toList());
     }
@@ -89,21 +87,53 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto getById(Long id) {
         Item item = itemRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Item not found")); // Извлекаем элемент
+                .orElseThrow(() -> new NotFoundException("Item not found"));
 
-        List<CommentDto> comments = getComments(item.getId()); // Получаем комментарии с информацией о пользователе
+        List<CommentDto> comments = getComments(item.getId());
 
-        return ItemMapper.mapToItemDto(item, comments); // Создаем ItemDto с комментариями
+        return ItemMapper.mapToItemDto(item, comments, null, null); // Создаем ItemDto с комментариями
     }
 
     @Override
-    public List<ItemDto> getAllFromUser(Long userId) {
-        List<Item> items = itemRepository.findByOwnerId(userId); // Извлекаем элементы владельца
+    public ItemDto getById(Long itemId, Long userId) {
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new NotFoundException("Item not found"));
+
+        List<CommentDto> comments = getComments(item.getId());
+
+        boolean isOwner = item.getOwner().getId().equals(userId);
+
+        LocalDateTime lastBookingDate = null;
+        LocalDateTime nextBookingDate = null;
+
+        if (isOwner) {
+            lastBookingDate = getLastBookingDate(item.getId());
+            nextBookingDate = getNextBookingDate(item.getId());
+        }
+
+        return ItemMapper.mapToItemDto(item, comments, lastBookingDate, nextBookingDate);
+    }
+
+    private LocalDateTime getLastBookingDate(Long itemId) {
+        return bookingRepository.findFirstByItemIdAndEndBeforeOrderByEndDesc(itemId, LocalDateTime.now())
+                .map(Booking::getEnd)
+                .orElse(null);
+    }
+
+    private LocalDateTime getNextBookingDate(Long itemId) {
+        return bookingRepository.findFirstByItemIdAndStartAfterOrderByStartAsc(itemId, LocalDateTime.now())
+                .map(Booking::getStart)
+                .orElse(null);
+    }
+
+    @Override
+    public List<ItemDto> getAllItemsByUser(Long userId) {
+        List<Item> items = itemRepository.findByOwnerId(userId);
 
         return items.stream()
                 .map(item -> {
-                    List<CommentDto> comments = getComments(item.getId()); // Извлекаем комментарии с авторами для каждого элемента
-                    return ItemMapper.mapToItemDto(item, comments); // Составляем ItemDto с комментариями
+                    List<CommentDto> comments = getComments(item.getId());
+                    return ItemMapper.mapToItemDto(item, comments, null, null);
                 })
                 .toList();
     }
@@ -115,20 +145,10 @@ public class ItemServiceImpl implements ItemService {
         }
         List<Item> items = itemRepository.findByAvailableTrueAndNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(text, text);
 
-//        return items.stream()
-//                .map(item -> {
-//                    List<CommentDto> comments = commentRepository.findByItemId(item.getId()) // Получаем комментарии для каждого элемента
-//                            .stream()
-//                            .map(CommentMapper::mapToCommentDto)
-//                            .toList();
-//                    return ItemMapper.mapToItemDto(item, comments); // Создаем ItemDto с комментариями
-//                })
-//                .toList();
         return items.stream()
                 .map(item -> {
-                    // Получаем комментарии для каждого элемента
                     List<CommentDto> comments = getComments(item.getId());
-                    return ItemMapper.mapToItemDto(item, comments); // Создаем ItemDto с комментариями
+                    return ItemMapper.mapToItemDto(item, comments, null, null);
                 })
                 .toList();
     }
@@ -136,6 +156,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public CommentDto createComment(Long itemId, CommentDto commentDto, Long userId) {
+        LocalDateTime today = LocalDateTime.now();
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User not found"));
@@ -143,17 +164,13 @@ public class ItemServiceImpl implements ItemService {
         itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Item not found"));
 
-        LocalDateTime now = LocalDateTime.now();
         List<Booking> bookings = bookingRepository.findByItemIdAndBookerId(itemId, userId);
-
-        LocalDate today = LocalDate.now();
 
         boolean hasActiveBooking = bookings.stream()
                 .anyMatch(booking -> {
-                    LocalDate startDate = booking.getStart().toLocalDate();
-                    LocalDate endDate = booking.getEnd().toLocalDate();
-                    // Проверка, что аренда была завершена до текущего дня
-                    return startDate.isBefore(today) && endDate.isBefore(today) && !startDate.isEqual(endDate);
+                    LocalDateTime startDate = booking.getStart();
+                    LocalDateTime endDate = booking.getEnd();
+                    return startDate.isBefore(today) && endDate.isBefore(today);
                 });
 
         if (!hasActiveBooking) {
@@ -169,7 +186,7 @@ public class ItemServiceImpl implements ItemService {
 
         commentRepository.save(comment);
 
-         return CommentMapper.mapToCommentDto(comment, user);
+        return CommentMapper.mapToCommentDto(comment, user);
     }
 
     protected List<CommentDto> getComments(Long itemId) {
@@ -178,8 +195,8 @@ public class ItemServiceImpl implements ItemService {
         return comments.stream()
                 .map(comment -> {
                     User author = userRepository.findById(comment.getAuthorId())
-                            .orElseThrow(() -> new NotFoundException("User not found")); // Получаем пользователя по ID автора
-                    return CommentMapper.mapToCommentDto(comment, author); // Передаем найденного пользователя в маппер
+                            .orElseThrow(() -> new NotFoundException("User not found"));
+                    return CommentMapper.mapToCommentDto(comment, author);
                 })
                 .collect(Collectors.toList());
     }
