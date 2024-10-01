@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.comment.dto.CommentDto;
@@ -31,6 +32,7 @@ public class ItemServiceImpl implements ItemService {
     private final CommentRepository commentRepository;
     private final BookingRepository bookingRepository;
 
+    @Transactional
     @Override
     public ItemDto create(Long userId, ItemDto itemDto) {
         User owner = userRepository.findById(userId)
@@ -53,6 +55,7 @@ public class ItemServiceImpl implements ItemService {
         return ItemMapper.mapToItemDto(itemRepository.save(item), List.of(), null, null);
     }
 
+    @Transactional
     @Override
     public ItemDto update(Long userId, Long itemId, ItemDto updatedItem) {
         Item item = itemRepository.findById(itemId)
@@ -160,6 +163,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
 
+    @Transactional
     @Override
     public CommentDto createComment(Long itemId, CommentDto commentDto, Long userId) {
         LocalDateTime today = LocalDateTime.now();

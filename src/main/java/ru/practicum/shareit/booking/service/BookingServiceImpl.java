@@ -3,6 +3,7 @@ package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
@@ -12,10 +13,10 @@ import ru.practicum.shareit.exception.InvalidDataException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.service.ItemServiceImpl;
+import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.service.UserServiceImpl;
+import ru.practicum.shareit.user.service.UserService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,9 +26,10 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
-    private final UserServiceImpl userService;
-    private final ItemServiceImpl itemService;
+    private final UserService userService;
+    private final ItemService itemService;
 
+    @Transactional
     @Override
     public BookingDto create(Long userId, BookingDto bookingDto) {
         User booker = UserMapper.mapToUser(userService.getById(userId));
@@ -45,6 +47,7 @@ public class BookingServiceImpl implements BookingService {
         return BookingMapper.mapToBookingDto(savedBooking);
     }
 
+    @Transactional
     @Override
     public BookingDto update(Long ownerId, Long bookingId, Boolean approved) {
         Booking booking = bookingRepository.findById(bookingId)
@@ -112,16 +115,5 @@ public class BookingServiceImpl implements BookingService {
                 .map(BookingMapper::mapToBookingDto)
                 .toList();
     }
-
-    @Override
-    public List<BookingDto> getAll() {
-        return List.of();
-    }
-
-    @Override
-    public BookingDto getById(Long id) {
-        return null;
-    }
-
 }
 

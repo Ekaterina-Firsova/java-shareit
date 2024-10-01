@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.shareit.booking.dto.BookingDto;
-import ru.practicum.shareit.booking.service.BookingServiceImpl;
-import ru.practicum.shareit.user.service.UserServiceImpl;
+import ru.practicum.shareit.booking.service.BookingService;
+import ru.practicum.shareit.user.service.UserService;
 
 import java.util.List;
 
@@ -25,8 +25,8 @@ import java.util.List;
 @Validated
 @RequiredArgsConstructor
 public class BookingController {
-    private final BookingServiceImpl bookingServiceImpl;
-    private final UserServiceImpl userServiceImpl;
+    private final BookingService bookingServiceImpl;
+    private final UserService userServiceImpl;
 
     @PostMapping
     public BookingDto create(@RequestHeader("X-Sharer-User-Id") Long userId,
@@ -66,6 +66,4 @@ public class BookingController {
         userServiceImpl.getById(userId);
         return bookingServiceImpl.getBookingOwner(state, userId);
     }
-
-
 }
