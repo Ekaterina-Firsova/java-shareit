@@ -1,16 +1,13 @@
 package ru.practicum.shareit.service;
 
-import java.util.Collection;
+import java.util.List;
 
 public interface CrudService<T> {
 
-  T create(T t);
+  T create(Long userId, T t);
 
-  T update(Long id, T t);
-
-  Collection<T> getAll();
+  List<T> getAll();
 
   T getById(Long id);
 
-  void delete(long id);
-}
+ }

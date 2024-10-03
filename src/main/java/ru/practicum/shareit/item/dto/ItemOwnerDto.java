@@ -14,7 +14,7 @@ import java.util.List;
  */
 @Data
 @Builder
-public class ItemDto {
+public class ItemOwnerDto {
     private Long id;
     private String name;
     private String description;

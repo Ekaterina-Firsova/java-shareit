@@ -17,36 +17,36 @@ import java.util.Collection;
 @Validated
 @RequiredArgsConstructor
 public class UserController {
-    private final UserService userService;
+    private final UserService userServiceImpl;
 
     @PostMapping
     public UserDto create(@Valid @RequestBody final UserDto userDto) {
         log.info("Request POST /users with body : {}", userDto);
-        return userService.create(userDto);
+        return userServiceImpl.create(userDto);
     }
 
     @GetMapping
     public Collection<UserDto> getAll() {
         log.info("Request GET /users");
-        return userService.getAll();
+        return userServiceImpl.getAll();
     }
 
     @GetMapping("/{id}")
     public UserDto getUser(@PathVariable long id) {
         log.info("Request GET /id: {}", id);
-        return userService.getById(id);
+        return userServiceImpl.getById(id);
     }
 
     @PatchMapping("/{id}")
     public UserDto updateUser(@PathVariable @NotNull Long id, @RequestBody @Valid UserDto updatedUser) {
         log.info("Request PATCH /id: {}", id);
-        return userService.update(id, updatedUser);
+        return userServiceImpl.update(id, updatedUser);
     }
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable long id) {
         log.info("Request DELETE /id: {}", id);
-        userService.delete(id);
+        userServiceImpl.delete(id);
     }
 }
 
