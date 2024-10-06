@@ -15,6 +15,7 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.request.mapper.ItemRequestMapper;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
@@ -78,7 +79,7 @@ public class ItemServiceImpl implements ItemService {
                 item.setAvailable(updatedItem.getAvailable());
             }
             if (updatedItem.getRequest() != null) {
-                item.setRequest(updatedItem.getRequest());
+                item.setRequest(ItemRequestMapper.mapToItemRequest(updatedItem.getRequest()));
             }
             if (updatedItem.getName() != null) {
                 item.setName(updatedItem.getName());

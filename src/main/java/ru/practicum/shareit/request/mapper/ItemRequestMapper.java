@@ -17,6 +17,9 @@ import java.util.stream.Collectors;
 @NotNull
 public class ItemRequestMapper {
     public ItemRequest mapToItemRequest(final ItemRequestDto itemRequestDto) {
+        if (itemRequestDto == null) {
+            return null;
+        }
 
         return ItemRequest.builder()
                 .id(itemRequestDto.getId())
@@ -27,6 +30,9 @@ public class ItemRequestMapper {
     }
 
     public ItemRequestDto mapToItemRequestDto(final ItemRequest itemRequest) {
+        if (itemRequest == null) {
+            return null;
+        }
 
         List<ItemOwnerDto> itemOwnerDto = List.of();
         if (itemRequest.getItems() != null && !itemRequest.getItems().isEmpty()) {

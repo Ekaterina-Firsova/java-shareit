@@ -5,6 +5,7 @@ import lombok.experimental.UtilityClass;
 import ru.practicum.shareit.comment.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.mapper.ItemRequestMapper;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,7 +20,7 @@ public class ItemMapper {
                 .name(itemDto.getName())
                 .description(itemDto.getDescription())
                 .owner(itemDto.getOwner())
-                .request(itemDto.getRequest())
+                .request(ItemRequestMapper.mapToItemRequest(itemDto.getRequest()))
                 .available(itemDto.getAvailable())
                 .build();
     }
@@ -31,7 +32,7 @@ public class ItemMapper {
                 .name(item.getName())
                 .description(item.getDescription())
                 .owner(item.getOwner())
-                .request(item.getRequest())
+                .request(ItemRequestMapper.mapToItemRequestDto(item.getRequest()))
                 .available(item.getAvailable())
                 .comments(comments)
                 .lastBooking(lastBookingDate)

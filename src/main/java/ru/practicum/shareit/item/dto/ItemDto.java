@@ -3,6 +3,7 @@ package ru.practicum.shareit.item.dto;
 import lombok.Builder;
 import lombok.Data;
 import ru.practicum.shareit.comment.dto.CommentDto;
+import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
@@ -20,7 +21,7 @@ public class ItemDto {
     private String description;
     private Boolean available;
     private User owner;
-    private ItemRequest request;
+    private ItemRequestDto request;
     private Long requestId;
     private List<CommentDto> comments;
     private LocalDateTime lastBooking;     // Последнее завершенное бронирование
