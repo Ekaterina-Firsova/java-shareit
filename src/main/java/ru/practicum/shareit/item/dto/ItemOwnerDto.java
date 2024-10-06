@@ -17,11 +17,5 @@ import java.util.List;
 public class ItemOwnerDto {
     private Long id;
     private String name;
-    private String description;
-    private Boolean available;
     private User owner;
-    private ItemRequest request;
-    private List<CommentDto> comments;
-    private LocalDateTime lastBooking;     // Последнее завершенное бронирование
-    private LocalDateTime nextBooking;     // Ближайшее будущее бронирование
 }

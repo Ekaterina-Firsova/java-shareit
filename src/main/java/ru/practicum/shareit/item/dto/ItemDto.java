@@ -21,6 +21,7 @@ public class ItemDto {
     private Boolean available;
     private User owner;
     private ItemRequest request;
+    //private Long requestId;
     private List<CommentDto> comments;
     private LocalDateTime lastBooking;     // Последнее завершенное бронирование
     private LocalDateTime nextBooking;     // Ближайшее будущее бронирование

@@ -35,14 +35,14 @@ public class ItemServiceImpl implements ItemService {
     @Transactional
     @Override
     public ItemDto create(Long userId, ItemDto itemDto) {
-        User owner = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("User not found"));
         if (itemDto.getName() == null || itemDto.getName().isEmpty()) {
             throw new InvalidDataException("Name cannot be empty");
         }
         if (itemDto.getDescription() == null || itemDto.getDescription().isEmpty()) {
             throw new InvalidDataException("Description cannot be empty");
         }
+        User owner = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User not found"));
 
         Item item = Item.builder()
                 .name(itemDto.getName())
@@ -50,6 +50,7 @@ public class ItemServiceImpl implements ItemService {
                 .available(itemDto.getAvailable())
                 .owner(owner)
                 .request(itemDto.getRequest())
+                //.request(itemDto.getRequest())
                 .build();
 
         return ItemMapper.mapToItemDto(itemRepository.save(item), List.of(), null, null);

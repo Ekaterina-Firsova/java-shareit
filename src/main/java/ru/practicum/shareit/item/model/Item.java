@@ -50,7 +50,12 @@ public class Item {
     @NotNull
     private User owner;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "request_id", nullable = false)
     private ItemRequest request;
+
+//    @Column(name = "request_id")
+//    private Long request;
+
+
 }
