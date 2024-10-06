@@ -32,6 +32,15 @@ public class BookingServiceImpl implements BookingService {
     @Transactional
     @Override
     public BookingDto create(Long userId, BookingDto bookingDto) {
+        LocalDateTime now = LocalDateTime.now();
+
+        if (bookingDto.getEnd() == null || bookingDto.getStart() == null
+                || bookingDto.getEnd().isEqual(bookingDto.getStart())
+                || bookingDto.getEnd().isBefore(bookingDto.getStart())
+                || bookingDto.getEnd().isBefore(now)
+                || bookingDto.getStart().isBefore(now)) {
+            throw new InvalidDataException("Неправильное время бронирования");
+        }
         User booker = UserMapper.mapToUser(userService.getById(userId));
 
         bookingDto.setStatus(BookingStatus.WAITING);

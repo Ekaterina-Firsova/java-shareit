@@ -53,9 +53,4 @@ public class Item {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "request_id", nullable = false)
     private ItemRequest request;
-
-//    @Column(name = "request_id")
-//    private Long request;
-
-
 }
