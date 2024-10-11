@@ -10,6 +10,8 @@ public interface ItemService extends CrudService<ItemDto> {
 
     ItemDto update(Long userId, Long itemId, ItemDto updatedItem);
 
+    List<ItemDto> getAll();
+
     ItemDto getById(Long id);
 
     ItemDto getById(Long id, Long userId);

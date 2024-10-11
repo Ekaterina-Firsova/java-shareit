@@ -2,14 +2,11 @@ package ru.practicum.shareit.request.mapper;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.experimental.UtilityClass;
-import ru.practicum.shareit.comment.dto.CommentDto;
-import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemOwnerDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.model.ItemRequest;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
