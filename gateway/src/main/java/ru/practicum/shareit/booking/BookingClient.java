@@ -30,9 +30,9 @@ public class BookingClient extends BaseClient {
         return get("/" + bookingId, userId);
     }
 
-    public ResponseEntity<Object> getBookingsByState(long userId, String state) {
+    public ResponseEntity<Object> getBookingsByState(long userId, BookingStatus state) {
         Map<String, Object> parameters = Map.of(
-                "state", state
+                "state", state.name()
         );
         return get("?state={state}", userId, parameters);
     }

@@ -29,7 +29,7 @@ public class BookingController {
 
     @GetMapping
     public ResponseEntity<Object> getBookingsByState(@RequestHeader("X-Sharer-User-Id") long userId,
-                                                     @RequestParam(required = false, defaultValue = "ALL") String state) {
+                                                     @RequestParam(required = false, defaultValue = "ALL") BookingStatus state) {
         log.info("Request GET /bookings?state={} by userId={}", state, userId);
         return bookingClient.getBookingsByState(userId, state);
     }

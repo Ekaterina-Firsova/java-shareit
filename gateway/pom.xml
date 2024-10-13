@@ -51,6 +51,13 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.instancio</groupId>
+			<artifactId>instancio-junit</artifactId>
+			<version>5.0.2</version>
+			<scope>test</scope> <!-- Только для тестирования -->
+		</dependency>
+
 	</dependencies>
 
 	<build>

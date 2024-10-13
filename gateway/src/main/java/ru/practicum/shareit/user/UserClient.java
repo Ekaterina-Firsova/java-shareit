@@ -24,7 +24,7 @@ public class UserClient extends BaseClient {
         );
     }
 
-    public ResponseEntity<Object> post(UserDto userDto) {
+    public ResponseEntity<Object> create(UserDto userDto) {
         return post("", userDto);
     }
 
@@ -38,9 +38,5 @@ public class UserClient extends BaseClient {
 
     public ResponseEntity<Object> patch(long userId, UserDto userDto) {
         return patch("/" + userId, userDto);
-    }
-
-    public ResponseEntity<Object> delete(long userId) {
-        return delete("/" + userId);
     }
 }

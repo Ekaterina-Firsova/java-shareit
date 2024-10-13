@@ -31,7 +31,7 @@ public class UserController {
     @PostMapping
     public ResponseEntity<Object> create(@Validated(Create.class) @RequestBody UserDto userDto) {
         log.info("Request: create user: {}", userDto);
-        return userClient.post(userDto);
+        return userClient.create(userDto);
     }
 
     @GetMapping
@@ -52,11 +52,5 @@ public class UserController {
             @Validated(Update.class) @RequestBody UserDto userDto) {
         log.info("Request: PATCH /users/{} with body: {}",userId, userDto);
         return userClient.patch(userId, userDto);
-    }
-
-    @DeleteMapping("/{userId}")
-    public void delete(@PathVariable long userId) {
-        log.info("Request DELETE /users/{}", userId);
-        userClient.delete(userId);
     }
 }
