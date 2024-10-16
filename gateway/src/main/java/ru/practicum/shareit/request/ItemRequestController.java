@@ -33,7 +33,7 @@ public class ItemRequestController {
     }
 
     @GetMapping
-    public ResponseEntity<Object> GetUserRequests(@RequestHeader("X-Sharer-User-Id") Long userId) {
+    public ResponseEntity<Object> getUserRequests(@RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("Request GET /requests with X-Sharer-User-Id: {}", userId);
         return itemRequestClient.getAllByUser(userId);
     }
