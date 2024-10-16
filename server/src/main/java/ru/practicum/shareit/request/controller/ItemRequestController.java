@@ -34,7 +34,7 @@ public class ItemRequestController {
     }
 
     @GetMapping
-    public List<ItemRequestDto> GetUserRequests(@RequestHeader("X-Sharer-User-Id") Long userId) {
+    public List<ItemRequestDto> getUserRequests(@RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("Request GET /requests with X-Sharer-User-Id: {}", userId);
         return itemRequestService.getAllRequestsByUser(userId);
     }
