@@ -62,7 +62,6 @@ public class ItemServiceImpl implements ItemService {
                 .request(itemRequest)
                 .build();
         ItemDto res = ItemMapper.mapToItemDto(itemRepository.save(item), List.of(), null, null);
-        System.out.println(res);
         return res;
     }
 

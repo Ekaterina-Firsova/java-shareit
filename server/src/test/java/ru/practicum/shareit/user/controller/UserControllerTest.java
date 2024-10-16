@@ -1,65 +1,100 @@
-package ru.practicum.shareit.user;
+package ru.practicum.shareit.user.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.service.UserServiceImpl;
 
 import java.util.List;
 
 import static org.instancio.Select.field;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(controllers = UserController.class)
+@ExtendWith(MockitoExtension.class)
 class UserControllerTest {
 
-    @Autowired
-    private ObjectMapper mapper;
+    private MockMvc mvc;
 
-    @Autowired
-    MockMvc mvc;
+    @Mock
+    private UserServiceImpl userServiceImpl;
 
-    @MockBean
-    private UserClient userClient;
+    @InjectMocks
+    private UserController userController;
 
-    @Test
-    void testGetUser() throws Exception {
-        long userId = 1L;
-        mvc.perform(get("/users/{id}", userId))
-                .andExpect(status().isOk());
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
-        verify(userClient).getById(userId);
+    @BeforeEach
+    void setUp() {
+        mvc = MockMvcBuilders.standaloneSetup(userController).build();
     }
 
     @Test
-    void testCreate() throws Exception {
+    public void testCreateUser_validEmail() throws Exception {
         UserDto userDto = Instancio.of(UserDto.class)
                 .generate(field("email"), gen -> gen.text().pattern("#a#a#a#a#a#a@example.com"))
                 .ignore(field("id"))
                 .create();
 
-        when(userClient.create(userDto)).thenReturn(ResponseEntity.ok(userDto));
+        when(userServiceImpl.create(userDto)).thenReturn(userDto);
 
         mvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(userDto)))
-                .andExpect(status().isOk());
+                        .content(objectMapper.writeValueAsString(userDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("name").value(userDto.getName()))
+                .andExpect(jsonPath("email").value(userDto.getEmail()));
 
-        verify(userClient).create(userDto);
+        verify(userServiceImpl).create(userDto);
+    }
+
+    @Test
+    public void testCreateUser_invalidEmail_thenReturnedBadRequest() throws Exception {
+        UserDto userDto = Instancio.of(UserDto.class)
+                .ignore(field("id"))
+                .create();
+
+        mvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userDto)))
+                .andExpect(status().isBadRequest());
+
+        verify(userServiceImpl, never()).create(userDto);
+    }
+
+    @Test
+    void testGetById() throws Exception {
+        UserDto userDto = Instancio.of(UserDto.class)
+                .generate(field("email"), gen -> gen.text().pattern("#a#a#a#a#a#a@example.com"))
+                .create();
+
+        when(userServiceImpl.getById(userDto.getId())).thenReturn(userDto);
+
+        mvc.perform(get("/users/{id}", userDto.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("name").value(userDto.getName()))
+                .andExpect(jsonPath("email").value(userDto.getEmail()));
+
+        verify(userServiceImpl).getById(userDto.getId());
     }
 
     @Test
@@ -75,7 +110,7 @@ class UserControllerTest {
 
         ResponseEntity<Object> responseEntity = ResponseEntity.ok(users);
 
-        when(userClient.getAll()).thenReturn(responseEntity);
+        when(userServiceImpl.getAll()).thenReturn(users);
 
         mvc.perform(get("/users"))
                 .andExpect(status().isOk())
@@ -83,7 +118,7 @@ class UserControllerTest {
                 .andExpect(jsonPath("$[0].name").value(users.get(0).getName()))
                 .andExpect(jsonPath("$[1].name").value(users.get(1).getName()));
 
-        verify(userClient).getAll();
+        verify(userServiceImpl).getAll();
     }
 
     @Test
@@ -96,28 +131,28 @@ class UserControllerTest {
                 .email("updated.email@example.com")
                 .build();
 
-        ResponseEntity<Object> responseEntity = ResponseEntity.ok(updatedUserDto);
-
-        when(userClient.patch(userId, updatedUserDto)).thenReturn(responseEntity);
+        when(userServiceImpl.update(userId, updatedUserDto)).thenReturn(updatedUserDto);
 
         mvc.perform(MockMvcRequestBuilders.patch("/users/{userId}", userId)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(updatedUserDto)))
+                        .content(objectMapper.writeValueAsString(updatedUserDto)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.name").value("Updated Name"))
                 .andExpect(jsonPath("$.email").value("updated.email@example.com"));
 
-        verify(userClient).patch(userId, updatedUserDto);
+        verify(userServiceImpl).update(userId, updatedUserDto);
     }
 
     @Test
     public void testDeleteUser() throws Exception {
         long userId = 1L;
 
-        mvc.perform(delete("/users/{userId}", userId))
+        mvc.perform(delete("/users/{id}", userId)
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        verify(userClient, times(1)).delete(userId);
+        verify(userServiceImpl, times(1)).delete(userId);
     }
+
 }

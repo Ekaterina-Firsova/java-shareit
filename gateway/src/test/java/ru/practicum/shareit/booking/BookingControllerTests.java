@@ -8,14 +8,12 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @WebMvcTest(controllers = BookingController.class)
@@ -63,7 +61,6 @@ public class BookingControllerTests {
     public void testCreateBooking() throws Exception {
         long userId = 1L;
 
-        // Пример данных для BookingDto
         BookingDto bookingDto = new BookingDto();
         bookingDto.setItemId(1L);
         bookingDto.setStart(LocalDateTime.now().plusDays(1));
@@ -81,7 +78,7 @@ public class BookingControllerTests {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(bookingDtoJson))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().string("Booking created"));  // Ожидаем тело ответа
+                .andExpect(MockMvcResultMatchers.content().string("Booking created"));
 
         Mockito.verify(bookingClient).create(Mockito.eq(userId), Mockito.any(BookingDto.class));
     }
@@ -99,9 +96,9 @@ public class BookingControllerTests {
 
         mockMvc.perform(MockMvcRequestBuilders.patch("/bookings/{bookingId}", bookingId)
                         .header("X-Sharer-User-Id", userId)
-                        .param("approved", approved.toString()))  // параметр approved передается как строка
-                .andExpect(MockMvcResultMatchers.status().isOk())  // Ожидаем статус 200 OK
-                .andExpect(MockMvcResultMatchers.content().string("Booking updated"));  // Ожидаем тело ответа
+                        .param("approved", approved.toString()))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().string("Booking updated"));
 
         Mockito.verify(bookingClient).update(Mockito.eq(userId), Mockito.eq(bookingId), Mockito.eq(approved));
     }

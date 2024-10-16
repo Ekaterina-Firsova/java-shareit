@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.user.service.UserService;
 

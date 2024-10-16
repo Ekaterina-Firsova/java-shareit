@@ -37,38 +37,12 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     public List<ItemRequestDto> getAllRequestsByUser(Long userId) {
         //получаем все запросы, сделанные пользователем userId
         List<ItemRequest> itemRequest = itemRequestRepository.findAllByRequester_IdOrderByCreatedDesc(userId);
-        //List<ItemRequest> itemRequest = itemRequestRepository.findRequestWithItems(userId);
 
         return itemRequest
                 .stream()
                 .map(ItemRequestMapper::mapToItemRequestDto)
                 .toList();
     }
-
-//    private ItemRequestDto mapToItemRequestDto(ItemRequest itemRequest) {
-//        // Преобразование списка Item в список ItemOwnerDto
-//        List<ItemOwnerDto> itemOwnerDtos = itemRequest.getItems().stream()
-//                .map(item -> ItemOwnerDto.builder()
-//                        .id(item.getId())
-//                        .name(item.getName())
-//                        .owner(User.builder()
-//                                .id(item.getOwner().getId())
-//                                .name(item.getOwner().getName())
-//                                .build()) // Преобразование owner в UserDto
-//                        .build())
-//                .collect(Collectors.toList());
-//
-//        return ItemRequestDto.builder()
-//                .id(itemRequest.getId())
-//                .description(itemRequest.getDescription())
-//                .requester(User.builder() // Преобразование requester в UserDto
-//                        .id(itemRequest.getRequester().getId())
-//                        .name(itemRequest.getRequester().getName())
-//                        .build())
-//                .created(itemRequest.getCreated())
-//                .items(itemOwnerDtos) // Здесь массив items заполняется
-//                .build();
-//    }
 
     @Override
     public List<ItemRequestDto> getAll(Long userId) {
@@ -81,9 +55,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Override
     public ItemRequestDto getById(Long id) {
         return ItemRequestMapper.mapToItemRequestDto(itemRequestRepository.findById(id)
-                .orElseThrow());
+                .orElseThrow(() -> new NotFoundException("Item request not found")));
     }
-
-
 
 }

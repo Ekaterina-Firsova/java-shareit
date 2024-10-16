@@ -10,15 +10,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import ru.practicum.shareit.booking.BookingClient;
-import ru.practicum.shareit.booking.BookingController;
 import ru.practicum.shareit.comment.CommentDto;
-import ru.practicum.shareit.user.UserDto;
 
 import java.util.List;
 
-import static org.instancio.Select.field;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -41,7 +36,7 @@ class ItemControllerTest {
     void testCreateItem() throws Exception {
         Long userId = 1L;
 
-         ItemDto itemDto = Instancio.of(ItemDto.class)
+        ItemDto itemDto = Instancio.of(ItemDto.class)
                 .create();
 
         ResponseEntity<Object> responseEntity = ResponseEntity.ok(itemDto);
@@ -88,14 +83,14 @@ class ItemControllerTest {
     @Test
     void testGetAllItems() throws Exception {
 
-         Long userId = 1L;
+        Long userId = 1L;
 
         List<ItemDto> items = List.of(
                 Instancio.of(ItemDto.class).create(),
                 Instancio.of(ItemDto.class).create()
         );
 
-         ResponseEntity<Object> responseEntity = ResponseEntity.ok(items);
+        ResponseEntity<Object> responseEntity = ResponseEntity.ok(items);
 
         when(itemClient.getAll(userId)).thenReturn(responseEntity);
 
@@ -110,17 +105,17 @@ class ItemControllerTest {
                 .andExpect(jsonPath("$[1].description").value(items.get(1).getDescription()))
                 .andExpect(jsonPath("$[1].available").value(items.get(1).getAvailable()));
 
-         verify(itemClient).getAll(userId);
+        verify(itemClient).getAll(userId);
     }
 
     @Test
     void testGetItemById() throws Exception {
         Long userId = 1L;
 
-       ItemDto itemDto = Instancio.of(ItemDto.class)
+        ItemDto itemDto = Instancio.of(ItemDto.class)
                 .create();
 
-       ResponseEntity<Object> responseEntity = ResponseEntity.ok(itemDto);
+        ResponseEntity<Object> responseEntity = ResponseEntity.ok(itemDto);
 
         when(itemClient.getById(itemDto.getId(), userId)).thenReturn(responseEntity);
 

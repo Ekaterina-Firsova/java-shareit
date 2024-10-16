@@ -53,4 +53,10 @@ public class UserController {
         log.info("Request: PATCH /users/{} with body: {}",userId, userDto);
         return userClient.patch(userId, userDto);
     }
+
+    @DeleteMapping("/{userId}")
+    public void delete(@PathVariable long userId) {
+        log.info("Request DELETE /users/{}", userId);
+        userClient.delete(userId);
+    }
 }
