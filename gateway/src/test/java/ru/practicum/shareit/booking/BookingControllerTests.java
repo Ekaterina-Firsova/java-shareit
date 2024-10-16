@@ -49,8 +49,6 @@ public class BookingControllerTests {
     public void testGetBookingsByStateIllegal() throws Exception {
         long userId = 1L;
         String state = "qwer";
-        ResponseEntity<Object> expectedResponse = ResponseEntity.ok("mocked response");
-
         mockMvc.perform(MockMvcRequestBuilders.get("/bookings")
                         .header("X-Sharer-User-Id", userId)
                         .param("state", state))
