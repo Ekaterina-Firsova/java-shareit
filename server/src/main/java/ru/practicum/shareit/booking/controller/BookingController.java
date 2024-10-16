@@ -67,4 +67,5 @@ public class BookingController {
         userServiceImpl.getById(userId);
         return bookingServiceImpl.getBookingOwner(state, userId);
     }
+
 }
