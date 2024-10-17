@@ -18,8 +18,10 @@ import ru.practicum.shareit.comment.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
+import static org.instancio.Select.field;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -69,6 +71,8 @@ public class ItemControllerTest {
         long userId = 1L;
         long itemId = 1L;
         ItemDto updatedItem = Instancio.of(ItemDto.class)
+                .set(field(ItemDto::getLastBooking), LocalDateTime.now().minusDays(1))
+                .set(field(ItemDto::getNextBooking), LocalDateTime.now().plusDays(1))
                 .create();
 
         Mockito.when(itemService.update(userId, itemId, updatedItem)).thenReturn(updatedItem);
