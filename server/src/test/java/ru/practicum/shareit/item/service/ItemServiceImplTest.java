@@ -100,36 +100,6 @@ class ItemServiceImplTest {
     }
 
     @Test
-    public void testCreateItem_EmptyName_ShouldThrowInvalidDataException() {
-        Long userId = 1L;
-        ItemDto itemDto = Instancio.of(ItemDto.class)
-                .ignore(field(ItemDto::getName))
-                .create();
-
-        InvalidDataException exception = assertThrows(InvalidDataException.class, () -> {
-            itemService.create(userId, itemDto);
-        });
-
-        assertEquals("Name cannot be empty", exception.getMessage());
-        Mockito.verify(userRepository, Mockito.never()).findById(Mockito.anyLong());
-    }
-
-    @Test
-    public void testCreateItem_EmptyDescription_ShouldThrowInvalidDataException() {
-        Long userId = 1L;
-        ItemDto itemDto = Instancio.of(ItemDto.class)
-                .ignore(field(ItemDto::getDescription))
-                .create();
-
-        InvalidDataException exception = assertThrows(InvalidDataException.class, () -> {
-            itemService.create(userId, itemDto);
-        });
-
-        assertEquals("Description cannot be empty", exception.getMessage());
-        Mockito.verify(userRepository, Mockito.never()).findById(Mockito.anyLong());
-    }
-
-    @Test
     public void testCreateItem_UserNotFound_ShouldThrowNotFoundException() {
         Long userId = 1L;
         ItemDto itemDto = Instancio.of(ItemDto.class)
@@ -754,30 +724,6 @@ class ItemServiceImplTest {
     }
 
     @Test
-    public void testCreate_ItemNameIsNull_ShouldThrowInvalidDataException() {
-        Long userId = 1L;
-        ItemDto itemDto = Instancio.of(ItemDto.class)
-                .ignore(field(ItemDto::getName))
-                .create();
-
-        assertThrows(InvalidDataException.class, () -> {
-            itemService.create(userId, itemDto);
-        }, "Expected InvalidDataException due to item name being null.");
-    }
-
-    @Test
-    public void testCreate_ItemNameIsEmpty_ShouldThrowInvalidDataException() {
-        Long userId = 1L;
-        ItemDto itemDto = Instancio.of(ItemDto.class)
-                .set(field(ItemDto::getName), "")
-                .create();
-
-        assertThrows(InvalidDataException.class, () -> {
-            itemService.create(userId, itemDto);
-        }, "Expected InvalidDataException due to item name being empty.");
-    }
-
-    @Test
     public void testCreate_ItemRequestDoesNotExist_ShouldThrowNotFoundException() {
         Long userId = 1L;
         Long requestId = 2L;
@@ -797,4 +743,109 @@ class ItemServiceImplTest {
 
         assertEquals("Request is not found", exception.getMessage());
     }
+
+    @Test
+    public void testUpdateItem_AvailableFieldNotUpdated_WhenNull() {
+        Long itemId = 1L;
+        Long userId = 1L;
+        Item item = new Item();
+        item.setId(itemId);
+        item.setAvailable(true);  // Старое значение
+        User owner = new User();
+        owner.setId(userId);
+        item.setOwner(owner);
+
+        ItemDto updatedItem = Instancio.of(ItemDto.class).create();
+        updatedItem.setAvailable(null);
+
+        Mockito.when(itemRepository.findById(itemId)).thenReturn(Optional.of(item));
+        Mockito.when(itemRepository.save(Mockito.any(Item.class))).thenReturn(item);
+        Mockito.when(commentRepository.findByItemId(itemId)).thenReturn(List.of());
+
+        ItemDto result = itemService.update(userId, itemId, updatedItem);
+
+        assertNotNull(result);
+        assertTrue(result.getAvailable(), "Expected availability not be updated.");
+
+        Mockito.verify(itemRepository, Mockito.times(1)).save(item);
+    }
+
+    @Test
+    public void testUpdateItem_RequestFieldNotUpdated_WhenNull() {
+        Long itemId = 1L;
+        Long userId = 1L;
+        Item item = Instancio.of(Item.class)
+                .create();
+        item.setId(itemId);
+        User owner = new User();
+        owner.setId(userId);
+        item.setOwner(owner);
+
+        ItemDto updatedItem = Instancio.of(ItemDto.class).create();
+        updatedItem.setRequest(null);
+
+        Mockito.when(itemRepository.findById(itemId)).thenReturn(Optional.of(item));
+        Mockito.when(itemRepository.save(Mockito.any(Item.class))).thenReturn(item);
+        Mockito.when(commentRepository.findByItemId(itemId)).thenReturn(List.of());
+
+        ItemDto result = itemService.update(userId, itemId, updatedItem);
+
+        assertNotNull(result);
+        assertEquals(result.getRequest().getId(), item.getRequest().getId());
+
+        Mockito.verify(itemRepository, Mockito.times(1)).save(item);
+    }
+
+    @Test
+    public void testUpdateItem_NameFieldNotUpdated_WhenNull() {
+        Long itemId = 1L;
+        Long userId = 1L;
+        Item item = Instancio.of(Item.class)
+                .create();
+        item.setId(itemId);
+        User owner = new User();
+        owner.setId(userId);
+        item.setOwner(owner);
+
+        ItemDto updatedItem = Instancio.of(ItemDto.class).create();
+        updatedItem.setName(null);
+
+        Mockito.when(itemRepository.findById(itemId)).thenReturn(Optional.of(item));
+        Mockito.when(itemRepository.save(Mockito.any(Item.class))).thenReturn(item);
+        Mockito.when(commentRepository.findByItemId(itemId)).thenReturn(List.of());
+
+        ItemDto result = itemService.update(userId, itemId, updatedItem);
+
+        assertNotNull(result);
+        assertEquals(result.getName(), item.getName());
+
+        Mockito.verify(itemRepository, Mockito.times(1)).save(item);
+    }
+
+    @Test
+    public void testUpdateItem_DescriptionFieldNotUpdated_WhenNull() {
+        Long itemId = 1L;
+        Long userId = 1L;
+        Item item = Instancio.of(Item.class)
+                .create();
+        item.setId(itemId);
+        User owner = new User();
+        owner.setId(userId);
+        item.setOwner(owner);
+
+        ItemDto updatedItem = Instancio.of(ItemDto.class).create();
+        updatedItem.setDescription(null);
+
+        Mockito.when(itemRepository.findById(itemId)).thenReturn(Optional.of(item));
+        Mockito.when(itemRepository.save(Mockito.any(Item.class))).thenReturn(item);
+        Mockito.when(commentRepository.findByItemId(itemId)).thenReturn(List.of());
+
+        ItemDto result = itemService.update(userId, itemId, updatedItem);
+
+        assertNotNull(result);
+        assertEquals(result.getDescription(), item.getDescription());
+
+        Mockito.verify(itemRepository, Mockito.times(1)).save(item);
+    }
+
 }

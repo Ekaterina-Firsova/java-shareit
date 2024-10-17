@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.service;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,13 +39,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Transactional
     @Override
-    public ItemDto create(Long userId, ItemDto itemDto) {
-        if (itemDto.getName() == null || itemDto.getName().isEmpty()) {
-            throw new InvalidDataException("Name cannot be empty");
-        }
-        if (itemDto.getDescription() == null || itemDto.getDescription().isEmpty()) {
-            throw new InvalidDataException("Description cannot be empty");
-        }
+    public ItemDto create(Long userId, @Valid ItemDto itemDto) {
         User owner = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User is not found"));
 
@@ -61,8 +56,7 @@ public class ItemServiceImpl implements ItemService {
                 .owner(owner)
                 .request(itemRequest)
                 .build();
-        ItemDto res = ItemMapper.mapToItemDto(itemRepository.save(item), List.of(), null, null);
-        return res;
+        return ItemMapper.mapToItemDto(itemRepository.save(item), List.of(), null, null);
     }
 
     @Transactional

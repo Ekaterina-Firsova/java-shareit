@@ -13,7 +13,7 @@ import java.util.List;
 @UtilityClass
 @NotNull
 public class ItemMapper {
-    public Item mapToItem(final ItemDto itemDto) {
+    public Item mapToItem(@NotNull final ItemDto itemDto) {
 
         return Item.builder()
                 .id(itemDto.getId())
@@ -25,7 +25,10 @@ public class ItemMapper {
                 .build();
     }
 
-    public ItemDto mapToItemDto(final Item item, List<CommentDto> comments, LocalDateTime lastBookingDate, LocalDateTime nextBookingDate) {
+    public ItemDto mapToItemDto(@NotNull final Item item,
+                                List<CommentDto> comments,
+                                LocalDateTime lastBookingDate,
+                                LocalDateTime nextBookingDate) {
 
         return ItemDto.builder()
                 .id(item.getId())
