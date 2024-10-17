@@ -19,18 +19,4 @@ public class CommentMapper {
                 .text(comment.getText())
                 .build();
     }
-
-    public static Comment mapToComment(CommentDto commentDto, User user) {
-        if (commentDto == null) {
-            return null;
-        }
-
-        return Comment.builder()
-                .id(commentDto.getId())
-                .created(commentDto.getCreated())
-                .itemId(commentDto.getItemId())
-                .authorId(user.getId())
-                .text(commentDto.getText())
-                .build();
-    }
 }

@@ -215,7 +215,7 @@ public class ItemServiceImpl implements ItemService {
         return comments.stream()
                 .map(comment -> {
                     User author = userRepository.findById(comment.getAuthorId())
-                            .orElseThrow(() -> new NotFoundException("User not found"));
+                            .orElseThrow(() -> new NotFoundException("getComments: User not found"));
                     return CommentMapper.mapToCommentDto(comment, author);
                 })
                 .collect(Collectors.toList());

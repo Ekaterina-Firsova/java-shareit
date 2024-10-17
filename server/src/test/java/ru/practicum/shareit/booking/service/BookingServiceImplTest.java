@@ -544,4 +544,57 @@ class BookingServiceImplTest {
         assertEquals(2, result.size());
         Mockito.verify(bookingRepository).findByItemOwnerIdOrderByStart(userId);
     }
+
+    @Test
+    public void testCreateBooking_WhenEndEqualsStart_ShouldThrowInvalidDataException() {
+        Long userId = 1L;
+        BookingDto bookingDto = new BookingDto();
+        LocalDateTime now = LocalDateTime.now();
+        bookingDto.setStart(now);
+        bookingDto.setEnd(now);  // конец совпадает с началом
+
+        assertThrows(InvalidDataException.class, () -> {
+            bookingService.create(userId, bookingDto);
+        }, "Expected InvalidDataException due to end equal to start.");
+    }
+
+    @Test
+    public void testCreateBooking_WhenEndBeforeStart_ShouldThrowInvalidDataException() {
+        Long userId = 1L;
+        BookingDto bookingDto = new BookingDto();
+        LocalDateTime now = LocalDateTime.now();
+        bookingDto.setStart(now.plusDays(1));
+        bookingDto.setEnd(now);  // конец раньше начала
+
+        assertThrows(InvalidDataException.class, () -> {
+            bookingService.create(userId, bookingDto);
+        }, "Expected InvalidDataException due to end before start.");
+    }
+
+    @Test
+    public void testCreateBooking_WhenEndBeforeNow_ShouldThrowInvalidDataException() {
+        Long userId = 1L;
+        BookingDto bookingDto = new BookingDto();
+        LocalDateTime now = LocalDateTime.now();
+        bookingDto.setStart(now.minusDays(2));
+        bookingDto.setEnd(now.minusDays(1));  // конец в прошлом
+
+        assertThrows(InvalidDataException.class, () -> {
+            bookingService.create(userId, bookingDto);
+        }, "Expected InvalidDataException due to end time in the past.");
+    }
+
+    @Test
+    public void testCreateBooking_WhenStartBeforeNow_ShouldThrowInvalidDataException() {
+        Long userId = 1L;
+        BookingDto bookingDto = new BookingDto();
+        LocalDateTime now = LocalDateTime.now();
+        bookingDto.setStart(now.minusHours(1));  // старт в прошлом
+        bookingDto.setEnd(now.plusHours(1));
+
+        assertThrows(InvalidDataException.class, () -> {
+            bookingService.create(userId, bookingDto);
+        }, "Expected InvalidDataException due to start time in the past.");
+    }
+
 }
