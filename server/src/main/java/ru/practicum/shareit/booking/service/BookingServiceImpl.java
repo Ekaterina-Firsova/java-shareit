@@ -23,13 +23,15 @@ import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final UserService userService;
     private final ItemService itemService;
 
-    @Transactional
+
     @Override
+    @Transactional
     public BookingDto create(Long userId, BookingDto bookingDto) {
         LocalDateTime now = LocalDateTime.now();
 
@@ -50,9 +52,7 @@ public class BookingServiceImpl implements BookingService {
 
         Booking booking = BookingMapper.mapToBooking(bookingDto, booker, item);
 
-        Booking savedBooking = bookingRepository.save(booking);
-
-        return BookingMapper.mapToBookingDto(savedBooking);
+        return BookingMapper.mapToBookingDto(bookingRepository.save(booking));
     }
 
     @Transactional

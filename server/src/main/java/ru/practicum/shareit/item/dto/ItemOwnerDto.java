@@ -2,7 +2,7 @@ package ru.practicum.shareit.item.dto;
 
 import lombok.Builder;
 import lombok.Data;
-import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.dto.UserDto;
 
 /**
  * Data Transfer Object representing an Item.
@@ -12,5 +12,5 @@ import ru.practicum.shareit.user.model.User;
 public class ItemOwnerDto {
     private Long id;
     private String name;
-    private User owner;
+    private UserDto owner;
 }

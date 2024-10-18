@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
@@ -37,8 +38,8 @@ public class ItemServiceImpl implements ItemService {
     private final BookingRepository bookingRepository;
     private final ItemRequestRepository itemRequestRepository;
 
-    @Transactional
     @Override
+    @Transactional
     public ItemDto create(Long userId, @Valid ItemDto itemDto) {
         User owner = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User is not found"));
@@ -59,8 +60,8 @@ public class ItemServiceImpl implements ItemService {
         return ItemMapper.mapToItemDto(itemRepository.save(item), List.of(), null, null);
     }
 
-    @Transactional
     @Override
+    @Transactional
     public ItemDto update(Long userId, Long itemId, ItemDto updatedItem) {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Item not found"));
@@ -104,7 +105,7 @@ public class ItemServiceImpl implements ItemService {
 
         List<CommentDto> comments = getComments(item.getId());
 
-        return ItemMapper.mapToItemDto(item, comments, null, null); // Создаем ItemDto с комментариями
+        return ItemMapper.mapToItemDto(item, comments, null, null);
     }
 
     @Override
@@ -167,8 +168,8 @@ public class ItemServiceImpl implements ItemService {
     }
 
 
-    @Transactional
     @Override
+    @Transactional
     public CommentDto createComment(Long itemId, CommentDto commentDto, Long userId) {
         LocalDateTime today = LocalDateTime.now();
 

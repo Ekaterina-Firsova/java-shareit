@@ -6,6 +6,7 @@ import ru.practicum.shareit.item.dto.ItemOwnerDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.user.mapper.UserMapper;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,7 +22,7 @@ public class ItemRequestMapper {
         return ItemRequest.builder()
                 .id(itemRequestDto.getId())
                 .description(itemRequestDto.getDescription())
-                .requester(itemRequestDto.getRequester())
+                .requester(UserMapper.mapToUser(itemRequestDto.getRequester()))
                 .created(itemRequestDto.getCreated())
                 .build();
     }
@@ -37,15 +38,11 @@ public class ItemRequestMapper {
                     .map(ItemRequestMapper::mapToItemOwnerDto)
                     .collect(Collectors.toList());
         }
-//        else {
-//            // Создаем список с пустой структурой, если items нет
-//            itemOwnerDto = List.of(createEmptyItemOwnerDto());
-//        }
 
         return ItemRequestDto.builder()
                 .id(itemRequest.getId())
                 .description(itemRequest.getDescription())
-                .requester(itemRequest.getRequester())
+                .requester(UserMapper.mapToUserDto(itemRequest.getRequester()))
                 .created(itemRequest.getCreated())
                 .items(itemOwnerDto)
                 .build();
@@ -55,15 +52,7 @@ public class ItemRequestMapper {
         return ItemOwnerDto.builder()
                 .id(item.getId())
                 .name(item.getName())
-                .owner(item.getOwner())
+                .owner(UserMapper.mapToUserDto(item.getOwner()))
                 .build();
     }
-
-//    private ItemOwnerDto createEmptyItemOwnerDto() {
-//        return ItemOwnerDto.builder()
-//                .id(0L) // Присваиваем дефолтные значения
-//                .name("") // Стандартное имя для пустого объекта
-//                .owner(null) // Нет владельца
-//                .build();
-//    }
 }

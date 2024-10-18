@@ -8,7 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import ru.practicum.shareit.comment.dto.CommentDto;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
-import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.dto.UserDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,7 +27,7 @@ public class ItemDto {
     @NotNull(message = "Availability must be specified")
     private Boolean available;
     @NotNull(message = "Owner must be specified")
-    private User owner;
+    private UserDto owner;
     private ItemRequestDto request;
     private Long requestId;
     private List<CommentDto> comments;
